@@ -74,4 +74,5 @@ def decode_recommendations(recommendations, dictionary, movie_dictionary, top_n=
     """Decode recommendations."""
     for i in range(top_n):
         movie_id = dictionary[recommendations[i][0]]
-        print(movie_dictionary[movie_id])
+        rating = round(recommendations[i][1], 4)
+        print(f"movie: {movie_dictionary[movie_id]} pred rating: {rating}")

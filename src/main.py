@@ -6,15 +6,17 @@ from src.config import config
 from src.util import create_item_dictionary, create_similarity_vector, create_recommendations, decode_recommendations
 
 
-def sample_data_and_transform(df, sample_n, columns_to_keep=None) -> pd.DataFrame:
+def sample_data_and_transform(df, sample_n, movies_to_keep_n=None) -> pd.DataFrame:
     """Sample and transform the ratings data."""
     sample = df.head(sample_n)
     sample = sample.pivot(index='userId', 
                           columns='movieId', 
                           values='rating')
 
-    if columns_to_keep is not None:
-        sample = sample[columns_to_keep]
+    if movies_to_keep_n is not None:
+        movies_to_keep = sample.count(axis=0).sort_values(ascending=False).index[:movies_to_keep_n]
+        print(movies_to_keep)
+        sample = sample[movies_to_keep]
 
     return sample
 
@@ -36,13 +38,13 @@ def main() -> None:
     # Load in data
     ratings = pd.read_csv(config.ratings_data)
     movies = pd.read_csv(config.movies_data)
-    ratings.drop(config.ratings_to_drop, axis=1, inplace=True)
-    movies.drop(config.movies_to_drop, axis=1, inplace=True)
+    ratings.drop(config.ratings_features_to_drop, axis=1, inplace=True)
+    movies.drop(config.movies_features_to_drop, axis=1, inplace=True)
     movie_dictionary = create_movies_dictionary(movies)
 
     # Create a sample of the data
     sample = sample_data_and_transform(ratings, config.sample_n, 
-                                       columns_to_keep=config.most_popular_movies_50)
+                                       movies_to_keep_n=config.movies_to_keep_n)
 
     # Create item dictionary
     item_dictionary = create_item_dictionary(sample.columns.tolist())
