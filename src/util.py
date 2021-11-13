@@ -1,4 +1,29 @@
 import numpy as np
+import pandas as pd
+
+def sample_data_and_transform(df, sample_n, movies_to_keep_n=None) -> pd.DataFrame:
+    """Sample and transform the ratings data."""
+    sample = df.head(sample_n)
+    sample = sample.pivot(index='userId', 
+                          columns='movieId', 
+                          values='rating')
+
+    if movies_to_keep_n is not None:
+        movies_to_keep = sample.count(axis=0).sort_values(ascending=False).index[:movies_to_keep_n]
+        sample = sample[movies_to_keep]
+
+    return sample
+
+def create_movies_dictionary(df):
+    """Create movies dictionary."""
+    movies_dictionary = {}
+    ids = [i for i in df['movieId'].values]
+    titles = [i for i in df['title'].values]
+
+    for i, id in enumerate(ids):
+        movies_dictionary[id] = titles[i]
+
+    return movies_dictionary
 
 def create_item_dictionary(item_list):
     """Create item dictionary."""
